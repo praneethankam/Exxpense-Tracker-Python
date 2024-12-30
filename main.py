@@ -9,7 +9,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS expenses (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT NOT NULL,
-            category TEXT NOT NULL,
+            description TEXT NOT NULL,
             amount REAL NOT NULL
         )
     """)
@@ -19,12 +19,12 @@ def init_db():
 # Add an expense
 def add_expense():
     date = input("Enter the date (YYYY-MM-DD): ")
-    category = input("Enter the category: ")
+    description = input("Enter the description: ")
     amount = float(input("Enter the amount: "))
     
     conn = sqlite3.connect("expenses.db")
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO expenses (date, category, amount) VALUES (?, ?, ?)", (date, category, amount))
+    cursor.execute("INSERT INTO expenses (date, description, amount) VALUES (?, ?, ?)", (date, description, amount))
     conn.commit()
     conn.close()
     print("Expense added successfully!")
@@ -33,14 +33,14 @@ def add_expense():
 def view_summary():
     conn = sqlite3.connect("expenses.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT id, category, SUM(amount) FROM expenses GROUP BY category")
+    cursor.execute("SELECT id, description, SUM(amount) FROM expenses GROUP BY description")
     data = cursor.fetchall()
     
     total = sum(row[2] for row in data)
     print(f"\nTotal Expenses: {total}")
     print("Category-wise Breakdown:")
     for row in data:
-        print(f" {row[0]}, Category: {row[1]}, Total: {row[2]}")
+        print(f" {row[0]}, description: {row[1]}, Total: {row[2]}")
     
     conn.close()
 
@@ -49,13 +49,13 @@ def search_by_date():
     date = input("Enter the date (YYYY-MM-DD): ")
     conn = sqlite3.connect("expenses.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT id, date, category, amount FROM expenses WHERE date = ?", (date,))
+    cursor.execute("SELECT id, date, description, amount FROM expenses WHERE date = ?", (date,))
     data = cursor.fetchall()
     
     if data:
         print(f"\nExpenses on {date}:")
         for row in data:
-            print(f"ID: {row[0]}, Category: {row[2]}, Amount: {row[3]}")
+            print(f"ID: {row[0]}, description: {row[2]}, Amount: {row[3]}")
     else:
         print("No expenses found for this date.")
     
@@ -67,7 +67,7 @@ def delete_record():
     cursor = conn.cursor()
 
     # Fetch all records and display them
-    cursor.execute("SELECT id, date, category, amount FROM expenses")
+    cursor.execute("SELECT id, date, description, amount FROM expenses")
     data = cursor.fetchall()
 
     # Check if there are any records
@@ -79,7 +79,7 @@ def delete_record():
     # Print all the records
     print("\nRecords in the database:")
     for row in data:
-        print(f"ID: {row[0]}, Date: {row[1]}, Category: {row[2]}, Amount: {row[3]}")
+        print(f"ID: {row[0]}, Date: {row[1]}, description: {row[2]}, Amount: {row[3]}")
 
     # Ask the user to enter the ID of the record they want to delete
     try:
